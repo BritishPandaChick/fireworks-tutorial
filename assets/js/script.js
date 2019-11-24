@@ -125,11 +125,35 @@ Firework.prototype.draw = function(){
   ctx.stroke();
 
   ctx.beginPath();
-  //draw the target 
+  //draw the target for this firewor with a pulsing circle
+  ctx.arc(this.tx, this.ty, this.targetRadius, 0, Math.PI * 2);
+  ctx.stroke();
 }
 
 //create particle
-function Particle(x,y){}
+function Particle(x,y){
+  this.x = x;
+  this.y = y;
+  //track the past coordinates of each particle to create a trail effect, increase the coordinate count to create more prominent trails
+   this.coordinates = [];
+   this.coordinateCount = 5;
+   while(this.coordinateCount--){
+     this.coordinates.push([this.x, this.y]);
+   }
+   //set a random angle in all possible directions, in radians
+   this.angle = random(0, Math.PI * 2);
+   this.speed = random(1,10);
+   //friction will slow the particle down
+   this.friction = 0.95;
+   //gravity will be applie dand pull the particle down
+   this.gravity = 1;
+   //set the hue to a random number +-20 of the overall hue variable
+   this.hue = random(hue-20, hue+20);
+   this.brightness = random(50,80);
+   this.alpha = 1;
+   //set how fast the particles fades out
+   this.decay = random(0.015, 0.03);
+}
 
 //update particle
 Particle.prototype.update = function(index){
@@ -143,7 +167,11 @@ Particle.prototype.draw = function(){
 
 //create particle group/explosion
 function createParticles(x,y){
-
+  //increase particle count for bigger explosions, beware of the canvas performance hit with the increased particles though
+  var particleCount = 30;
+  while(particleCount--){
+    particles.push(new Particle(x,y));
+  }
 }
 
 //main demo loop
@@ -151,8 +179,29 @@ function loop(){
   //this function runs endlessly with requestAnimationFrame
   requestAnimFrame(loop);
 
+  // increase the hue to get different colored fireworks over time
+  hue += 0.5;
+
+  // normally clearRect() would be used to clear the canvas
+  // we want to create a trailing effect though
+  // setting the composite operation to destination-out will allow us to clear the canvas at a specific opacity, rather than wiping it entirely
+  ctx.globalCompositeOperation = 'destination-out';
+  //decrease the alpha property to create more prominent trails
+  ctx.fillStyle = 'rgba(0,0,0,0.5)';
+  ctx.fillRect(0,0,cw,ch);
+  // change the composite operation back to our main mode
+  // lighter creates bright highlight points as the fireworks and particles overlap each other
+  ctx.globalCompositeOperation = 'lighter';
+
   //loop over each firework,draw it, update it
   var i= fireworks.length;
+  while(i--){
+    fireworks[i].draw();
+    fireworks[i].update(i);
+  }
+
+  //loop over each particle, draw it, update it
+  var i = particles.length;
   while(i--){
     fireworks[i].draw();
     fireworks[i].update(i);
