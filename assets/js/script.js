@@ -105,7 +105,7 @@ Firework.prototype.update = function(index) {
 
   //if distance traveled, including velocities, is greater than the initial distance to the target, then the target has been reached
   if(this.distanceTraveled >= this.distanceToTarget){
-    //create particle explosiion, will add later
+    createParticles(this.tx, this.ty);
     //remove the firework, use the index passed into the update function to determine which to remove
     fireworks.splice(index, 1);
   } else {
@@ -157,12 +157,32 @@ function Particle(x,y){
 
 //update particle
 Particle.prototype.update = function(index){
+  //remove last item in coordinates array
+  this.coordinates.pop();
+  //add current coordinates to the start of the array
+  this.coordinates.unshift([this.x, this.y]);
+  //slow down the particle
+  this.speed *= this.friction;
+  //apply velocity
+  this.x += Math.cos(this.angle) * this.speed;
+  this.y += Math.sin(this.angle) * this.speed + this.gravity;
+  //fade out the particle
+  this.alpha -= this.decay;
 
+  //remove the particle once the alpha is low enough, based on the passed in index
+  if(this.alpha <= this.decay){
+    particles.splice(index, 1);
+  }
 }
 
 //draw particle
 Particle.prototype.draw = function(){
-
+  ctx.beginPath();
+  //move to the last tracked coordinates in the set, then draw a line to the current x and y
+  ctx.moveTo(this.coordinates[this.coordinates.length - 1][0], this.coordinates[this.coordinates.length - 1][1]);
+  ctx.lineTo(this.x this.y);
+  ctx.strokeStyle="hsla(" + this.hue + ", 100%," + this.brightness + "%," + this.alpha + ")";
+  ctx.stroke();
 }
 
 //create particle group/explosion
@@ -203,8 +223,8 @@ function loop(){
   //loop over each particle, draw it, update it
   var i = particles.length;
   while(i--){
-    fireworks[i].draw();
-    fireworks[i].update(i);
+    particles[i].draw();
+    particles[i].update(i);
   }
 
   //launch fireworks automatically to random coordiantes
@@ -217,17 +237,30 @@ function loop(){
   } else {
     timerTick++;
   }
+
+  //limit the rate at which fireworks get launched when mouse is down
+  if(limiterTick >= limiterTotal){
+    if(mousedown){
+      //start the fireworks at the bottom of the middle of the screen then set the current mouse coordinates as the target
+      fireworks.push(new Firework(cw/2, ch, mx, my));
+      limiterTick = 0;
+    }
+  } else {
+    limiterTick++;
+  }
 }
 
 //mouse event bindings
 //update the mouse coordinates on mousemove
 canvas.addEventListener('mousemove', function(e){
-
+  mx = e.pageX - canvas.offsetLeft;
+  my = e.pageY - canvas.offsetTop;
 });
 
 //toggle mousedown state and prevent canvas from being selected
 canvas.addEventListener("mousedown", function(e){
-
+  e.preventDefault();
+  mousedown = false;
 });
 
 canvas.addEventListener("mouseup", function(e){
