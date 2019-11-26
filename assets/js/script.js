@@ -38,7 +38,6 @@ canvas.width = cw;
 canvas.height = ch;
 
 //setup function placeholders
-
 //get random number within a range
 function random(min, max){
   return Math.random() * (max - min) + min;
@@ -148,7 +147,7 @@ function Particle(x,y){
    //gravity will be applie dand pull the particle down
    this.gravity = 1;
    //set the hue to a random number +-20 of the overall hue variable
-   this.hue = random(hue-20, hue+20);
+   this.hue = random(hue - 20, hue + 20);
    this.brightness = random(50,80);
    this.alpha = 1;
    //set how fast the particles fades out
@@ -180,7 +179,7 @@ Particle.prototype.draw = function(){
   ctx.beginPath();
   //move to the last tracked coordinates in the set, then draw a line to the current x and y
   ctx.moveTo(this.coordinates[this.coordinates.length - 1][0], this.coordinates[this.coordinates.length - 1][1]);
-  ctx.lineTo(this.x this.y);
+  ctx.lineTo(this.x, this.y);
   ctx.strokeStyle="hsla(" + this.hue + ", 100%," + this.brightness + "%," + this.alpha + ")";
   ctx.stroke();
 }
@@ -207,8 +206,8 @@ function loop(){
   // setting the composite operation to destination-out will allow us to clear the canvas at a specific opacity, rather than wiping it entirely
   ctx.globalCompositeOperation = 'destination-out';
   //decrease the alpha property to create more prominent trails
-  ctx.fillStyle = 'rgba(0,0,0,0.5)';
-  ctx.fillRect(0,0,cw,ch);
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+  ctx.fillRect(0, 0, cw, ch);
   // change the composite operation back to our main mode
   // lighter creates bright highlight points as the fireworks and particles overlap each other
   ctx.globalCompositeOperation = 'lighter';
@@ -260,11 +259,12 @@ canvas.addEventListener('mousemove', function(e){
 //toggle mousedown state and prevent canvas from being selected
 canvas.addEventListener("mousedown", function(e){
   e.preventDefault();
-  mousedown = false;
+  mousedown = true;
 });
 
 canvas.addEventListener("mouseup", function(e){
-
+  e.preventDefault();
+  mousedown = false;
 });
 
 //once the window loads, we are ready for some fireworks!
