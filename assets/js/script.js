@@ -2,11 +2,11 @@
 //not supported in all browsers though and sometimes need a prefix, so we need a shim
 window.requestAnimFrame = (function(){
   return window.requestAnimationFrame ||
-    window.webkitRequestAnimationFrame ||
-    window.mozRequestAnimationFrame ||
-    function(callback){
-      window.setTimeout(callback, 1000/60);
-    };
+        window.webkitRequestAnimationFrame ||
+        window.mozRequestAnimationFrame ||
+        function(callback){
+          window.setTimeout(callback, 1000/60);
+        };
 })();
 
 //now we will setup our basic variables for the demo
@@ -28,7 +28,7 @@ var canvas = document.getElementById('canvas'),
   timerTotal = 80,
   timerTick = 0,
   mousedown = false,
-  //mouse x coordinate
+  //mouse x coordinate,
   mx,
   //mouse y coordinate
   my;
@@ -37,7 +37,8 @@ var canvas = document.getElementById('canvas'),
 canvas.width = cw;
 canvas.height = ch;
 
-//setup function placeholders
+//setup function placeholders for the entire time
+
 //get random number within a range
 function random(min, max){
   return Math.random() * (max - min) + min;
@@ -45,7 +46,7 @@ function random(min, max){
 
 //calculate the distance between two points
 function calculateDistance(p1x, p1y, p2x, p2y){
-  var xDistance = p1x - p2x;
+  var xDistance = p1x - p2x,
       yDistance = p1y - p2y;
   return Math.sqrt(Math.pow(xDistance, 2) + Math.pow(yDistance, 2));
 }
@@ -120,7 +121,7 @@ Firework.prototype.draw = function(){
   //move to the last tracked coordinate in the set, then draw a line to the current x and y
   ctx.moveTo(this.coordinates[this.coordinates.length - 1][0], this.coordinates[this.coordinates.length - 1][1]);
   ctx.lineTo(this.x, this.y);
-  ctx.strokeStyle = 'hsl(' + hue + ', 100%' + this.brightness + '%)';
+  ctx.strokeStyle = 'hsl(' + hue + ', 100%, ' + this.brightness + '%)';
   ctx.stroke();
 
   ctx.beginPath();
@@ -134,19 +135,19 @@ function Particle(x,y){
   this.x = x;
   this.y = y;
   //track the past coordinates of each particle to create a trail effect, increase the coordinate count to create more prominent trails
-   this.coordinates = [];
-   this.coordinateCount = 5;
-   while(this.coordinateCount--){
-     this.coordinates.push([this.x, this.y]);
-   }
-   //set a random angle in all possible directions, in radians
-   this.angle = random(0, Math.PI * 2);
-   this.speed = random(1,10);
-   //friction will slow the particle down
-   this.friction = 0.95;
-   //gravity will be applie dand pull the particle down
-   this.gravity = 1;
-   //set the hue to a random number +-20 of the overall hue variable
+  this.coordinates = [];
+  this.coordinateCount = 5;
+  while(this.coordinateCount--){
+    this.coordinates.push([this.x, this.y]);
+  }
+  //set a random angle in all possible directions, in radians
+  this.angle = random(0, Math.PI * 2);
+  this.speed = random(1,10);
+  //friction will slow the particle down
+  this.friction = 0.95;
+  //gravity will be applie dand pull the particle down
+  this.gravity = 1;
+  //set the hue to a random number +-20 of the overall hue variable
    this.hue = random(hue - 20, hue + 20);
    this.brightness = random(50,80);
    this.alpha = 1;
@@ -180,7 +181,7 @@ Particle.prototype.draw = function(){
   //move to the last tracked coordinates in the set, then draw a line to the current x and y
   ctx.moveTo(this.coordinates[this.coordinates.length - 1][0], this.coordinates[this.coordinates.length - 1][1]);
   ctx.lineTo(this.x, this.y);
-  ctx.strokeStyle="hsla(" + this.hue + ", 100%," + this.brightness + "%," + this.alpha + ")";
+  ctx.strokeStyle = 'hsla(' + this.hue = ', 100%, ' + this.brightness + '%, ' + this.alpha + ')';
   ctx.stroke();
 }
 
@@ -213,7 +214,7 @@ function loop(){
   ctx.globalCompositeOperation = 'lighter';
 
   //loop over each firework,draw it, update it
-  var i= fireworks.length;
+  var i = fireworks.length;
   while(i--){
     fireworks[i].draw();
     fireworks[i].update(i);
@@ -241,7 +242,7 @@ function loop(){
   if(limiterTick >= limiterTotal){
     if(mousedown){
       //start the fireworks at the bottom of the middle of the screen then set the current mouse coordinates as the target
-      fireworks.push(new Firework(cw/2, ch, mx, my));
+      fireworks.push(new Firework(cw / 2, ch, mx, my));
       limiterTick = 0;
     }
   } else {
